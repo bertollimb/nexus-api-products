@@ -30,7 +30,7 @@ async def get_product(product_id: int):
                             status_code=status.HTTP_404_NOT_FOUND)
     
 # POST PRODUCTS
-@router.post('/', status_code=status.HTTP_201_CREATED)
+@router.post('/', response_model=ProductResponse , status_code=status.HTTP_201_CREATED)
 async def post_products(product: ProductCreate):
     """
     Create a new product.
@@ -42,9 +42,13 @@ async def post_products(product: ProductCreate):
 
     next_id = max(products.keys()) + 1 if products else 1
 
-    product_data = product.model_dump()
-    product_data.pop("id", None)
+    product_data = {
+        "id": next_id,
+        **product.model_dump()
+    }
+
     products[next_id] = product_data
+
     return product_data
 
 # DELETE PRODUCTS
