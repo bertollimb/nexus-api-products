@@ -9,7 +9,7 @@ router = APIRouter()
 products: Dict[int, dict] = {}
 
 # GET PRODUCTS
-@router.get('/products', response_model=Dict[int, ProductResponse])
+@router.get('/', response_model=Dict[int, ProductResponse])
 async def get_products():
     """
     Retrieve a list of all products.
@@ -17,7 +17,7 @@ async def get_products():
     return products
 
 # GET PRODUCT
-@router.get('/products/{product_id}', response_model=ProductResponse)
+@router.get('/{product_id}', response_model=ProductResponse)
 async def get_product(product_id: int):
     """
     Retrieve a single product by ID.
@@ -30,7 +30,7 @@ async def get_product(product_id: int):
                             status_code=status.HTTP_404_NOT_FOUND)
     
 # POST PRODUCTS
-@router.post('/products', status_code=status.HTTP_201_CREATED)
+@router.post('/', status_code=status.HTTP_201_CREATED)
 async def post_products(product: ProductCreate):
     """
     Create a new product.
@@ -48,7 +48,7 @@ async def post_products(product: ProductCreate):
     return product_data
 
 # DELETE PRODUCTS
-@router.delete('/products/{product_id}')
+@router.delete('/{product_id}')
 async def delete_product(product_id: int):
     """
     Delete a product by ID.
