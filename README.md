@@ -1,134 +1,145 @@
 # Products API
 
-Simple REST API built with FastAPI for product management. The project implements basic CRUD operations using in-memory storage.
+REST API built with FastAPI for product management. The project implements full CRUD operations with PostgreSQL database persistence.
 
 ---
 
 ## About the Project
 
-This API allows you to create, list, retrieve, and delete products. Data is temporarily stored in memory (Python dictionary), making it ideal for learning purposes and API prototyping with FastAPI.
+This API allows you to create, list, retrieve, and delete products. Data is persisted in a PostgreSQL database using SQLAlchemy async, making it a production-ready API structure built for learning and portfolio purposes.
 
 ---
 
-##  Technologies Used
+## Technologies Used
 
 - Python 3.10+
 - FastAPI
 - Uvicorn
 - Pydantic
+- PostgreSQL
+- SQLAlchemy (async)
+- Alembic
+- Pydantic Settings
 
 ---
 
-##  Project Structure
+## Project Structure
 
-```
-```
-fastapi-products-api/
+nexus-api-products/
 ├── api/
 │   └── v1/
 │       ├── api.py
 │       └── endpoints/
-│           ├── product.py
+│           └── product.py
+├── alembic/
+│   └── versions/
+├── core/
+│   ├── configs.py
+│   ├── database.py
+│   └── deps.py
+├── models/
+│   └── product_model.py
 ├── schemas/
-│   ├── product_schema.py
-│
+│   └── product_schema.py
+├── .env.example
 ├── .gitignore
+├── alembic.ini
 ├── main.py
 ├── requirements.txt
 └── LICENSE
-```
 
 ---
 
-##  Installation
+## Prerequisites
+
+- Python 3.10+
+- PostgreSQL running locally
+
+---
+
+## Installation
 
 ### 1. Clone the repository
 
-```bash
 git clone https://github.com/bertollimb/nexus-api-products
 cd nexus-api-products
-```
 
 ### 2. Create a virtual environment
 
-```bash
 python -m venv venv
-```
 
 ### 3. Activate the virtual environment
 
-**Windows:**
-```bash
+Windows:
 venv\Scripts\activate
-```
 
-**Linux/Mac:**
-```bash
+Linux/Mac:
 source venv/bin/activate
-```
 
 ### 4. Install dependencies
 
-```bash
-pip install fastapi uvicorn pydantic
-```
+pip install fastapi uvicorn pydantic sqlalchemy asyncpg alembic pydantic-settings python-dotenv
+
+### 5. Configure environment variables
+
+Copy the example file and fill in your database credentials:
+
+cp .env.example .env
+
+### 6. Run database migrations
+
+alembic upgrade head
 
 ---
 
-##  Running the Project
+## Running the Project
 
-```bash
 python main.py
-```
 
 or
 
-```bash
 uvicorn main:app --reload
-```
 
 ---
 
-##  API Endpoints
+## API Endpoints
 
-### GET /products/
+### GET /api/v1/products/
 Returns a list of all products.
 
-### GET /products/{id}
+### GET /api/v1/products/{id}
 Returns a product by its ID.
 
-### POST /products/
+### POST /api/v1/products/
 Creates a new product.
 
 Example body:
 
-```json
 {
   "name": "Product 1",
   "price": 10.5,
   "description": "Product description"
 }
-```
 
-### DELETE /products/{id}
+### DELETE /api/v1/products/{id}
 Deletes a product by ID.
 
 ---
 
-##  Notes
+## Notes
 
-- Data is stored in memory (no database).
-- All data is lost when the server restarts.
-- This project is intended for learning FastAPI and API structuring.
+- Data is persisted in a PostgreSQL database.
+- Run migrations before starting the server for the first time.
+- This project is intended for learning FastAPI, SQLAlchemy, and professional API structuring.
 
 ---
 
-##  Automatic Documentation
+## Automatic Documentation
 
 After starting the server:
 
-- Swagger UI: http://localhost:8000/docs  
-- Redoc: http://localhost:8000/redoc  
+- Swagger UI: http://localhost:8000/docs
+- Redoc: http://localhost:8000/redoc
 
 ---
 
