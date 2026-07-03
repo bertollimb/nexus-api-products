@@ -25,6 +25,7 @@ This API allows you to create, list, retrieve, and delete products. Data is pers
 
 ## Project Structure
 
+```
 nexus-api-products/
 ├── api/
 │   └── v1/
@@ -47,6 +48,7 @@ nexus-api-products/
 ├── main.py
 ├── requirements.txt
 └── LICENSE
+```
 
 ---
 
