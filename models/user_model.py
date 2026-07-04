@@ -1,0 +1,13 @@
+from sqlalchemy import Integer, String, Column, Boolean
+
+from core.database import Base
+
+class UserModel(Base):
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(256), nullable=True)
+    lastname = Column(String(256), nullable=True)
+    email = Column(String(256), index=True, nullable=False, unique=True)
+    password = Column(String(256), nullable=False)
+    is_admin = Column(Boolean, default=False)

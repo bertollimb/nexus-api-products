@@ -4,6 +4,7 @@ from core.configs import settings
 
 Base = declarative_base()
 
+
 engine: AsyncEngine = create_async_engine(settings.DB_URL)
 
 Session: sessionmaker = sessionmaker(
