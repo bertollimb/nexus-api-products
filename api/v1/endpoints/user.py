@@ -63,7 +63,7 @@ async def get_users(db: AsyncSession = Depends(get_session), user_logged: UserMo
     return users
 
 # GET USER
-@router.get('/{user_id}', response_model=UserSchemaProducts, status_code=status.HTTP_200_OK)
+@router.get('/{user_id}', response_model=UserSchemaBase, status_code=status.HTTP_200_OK)
 async def get_user(user_id: int, db: AsyncSession = Depends(get_session)):
     query = select(UserModel).filter(UserModel.id == user_id)
     result = await db.execute(query)
