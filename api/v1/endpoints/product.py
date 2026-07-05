@@ -5,9 +5,11 @@ from fastapi import APIRouter, HTTPException, Depends, status, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from models.user_model import UserModel
 from models.product_model import ProductModel
 from schemas.product_schema import ProductBase, ProductCreate, ProductResponse
 from core.deps import get_session
+from core.auth import get_current_user
 
 router = APIRouter()
 
@@ -60,6 +62,30 @@ async def post_products(product: ProductCreate, db: AsyncSession = Depends(get_s
     await db.refresh(new_product)
 
     return new_product
+
+# PUT PRODUCTS
+@router.put('/{product_id}', response_model=ProductResponse, status_code=status.HTTP_202_ACCEPTED)
+async def put_product(product_id: int, product: ProductCreate, db: AsyncSession = Depends(get_session), user_logged: UserModel = Depends(get_current_user)):
+    async with db as session:
+        query = select(ProductModel).filter(ProductModel.id == product_id)
+        result = await session.execute(query)
+        product_up: ProductModel = result.scalars().unique().one_or_none()
+
+        if product_up:
+            if product.name:
+                product_up.name = product.name
+            if product.price:
+                product_up.price = product.price
+            if product.description:
+                product_up.description = product.description
+
+            await session.commit()
+            await session.refresh(product_up)
+
+            return product_up
+        else:
+            raise HTTPException(detail="product not found",
+                                status_code=status.HTTP_404_NOT_FOUND)
 
 # DELETE PRODUCTS
 @router.delete('/{product_id}', status_code=status.HTTP_204_NO_CONTENT)

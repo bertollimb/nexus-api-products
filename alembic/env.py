@@ -6,6 +6,7 @@ from sqlalchemy import pool
 
 from core.database import Base
 from models.product_model import ProductModel
+from models.user_model import UserModel
 
 from alembic import context
 
