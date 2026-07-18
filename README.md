@@ -1,12 +1,12 @@
 # Products API
 
-REST API built with FastAPI for product management. The project implements full CRUD operations with PostgreSQL database persistence and JWT authentication.
+REST API built with FastAPI for product management. The project implements full CRUD operations with PostgreSQL database persistence, JWT authentication, and automated tests.
 
 ---
 
 ## About the Project
 
-This API allows you to create, list, retrieve, update, and delete products. Data is persisted in a PostgreSQL database using SQLAlchemy async. The API includes a complete user management system with JWT authentication, protecting sensitive endpoints from unauthorized access.
+This API allows you to create, list, retrieve, update, and delete products. Data is persisted in a PostgreSQL database using SQLAlchemy async. The API includes a complete user management system with JWT authentication, protecting sensitive endpoints from unauthorized access. The project includes an automated test suite covering the main API flows.
 
 ---
 
@@ -23,6 +23,9 @@ This API allows you to create, list, retrieve, update, and delete products. Data
 - python-jose
 - passlib
 - python-multipart
+- pytest
+- pytest-asyncio
+- httpx
 
 ---
 
@@ -49,9 +52,15 @@ nexus-api-products/
 ├── schemas/
 │   ├── product_schema.py
 │   └── user_schema.py
+├── tests/
+│   ├── __init__.py
+│   ├── conftest.py
+│   ├── test_products.py
+│   └── test_users.py
 ├── .env.example
 ├── .gitignore
 ├── alembic.ini
+├── pytest.ini
 ├── main.py
 ├── requirements.txt
 └── LICENSE
@@ -86,7 +95,7 @@ source venv/bin/activate
 
 ### 4. Install dependencies
 
-pip install fastapi uvicorn pydantic sqlalchemy asyncpg alembic pydantic-settings python-dotenv python-jose passlib python-multipart
+pip install fastapi uvicorn pydantic sqlalchemy asyncpg alembic pydantic-settings python-dotenv python-jose passlib python-multipart pytest pytest-asyncio httpx aiosqlite
 
 ### 5. Configure environment variables
 
@@ -107,6 +116,14 @@ python main.py
 or
 
 uvicorn main:app --reload
+
+---
+
+## Running Tests
+
+pytest tests/ -v
+
+Tests use an isolated SQLite database and do not affect your PostgreSQL data.
 
 ---
 
@@ -159,6 +176,7 @@ DELETE /api/v1/products/{id} — delete product
 
 - Data is persisted in a PostgreSQL database.
 - Run migrations before starting the server for the first time.
+- Tests use an isolated SQLite in-memory database.
 - This project is intended for learning FastAPI, SQLAlchemy, and professional API structuring.
 
 ---
