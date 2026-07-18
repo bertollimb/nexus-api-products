@@ -1,12 +1,12 @@
 # Products API
 
-REST API built with FastAPI for product management. The project implements full CRUD operations with PostgreSQL database persistence.
+REST API built with FastAPI for product management. The project implements full CRUD operations with PostgreSQL database persistence and JWT authentication.
 
 ---
 
 ## About the Project
 
-This API allows you to create, list, retrieve, and delete products. Data is persisted in a PostgreSQL database using SQLAlchemy async, making it a production-ready API structure built for learning and portfolio purposes.
+This API allows you to create, list, retrieve, update, and delete products. Data is persisted in a PostgreSQL database using SQLAlchemy async. The API includes a complete user management system with JWT authentication, protecting sensitive endpoints from unauthorized access.
 
 ---
 
@@ -20,28 +20,35 @@ This API allows you to create, list, retrieve, and delete products. Data is pers
 - SQLAlchemy (async)
 - Alembic
 - Pydantic Settings
+- python-jose
+- passlib
+- python-multipart
 
 ---
 
 ## Project Structure
-
 ```
 nexus-api-products/
 ├── api/
 │   └── v1/
 │       ├── api.py
 │       └── endpoints/
-│           └── product.py
+│           ├── product.py
+│           └── user.py
 ├── alembic/
 │   └── versions/
 ├── core/
+│   ├── auth.py
 │   ├── configs.py
 │   ├── database.py
-│   └── deps.py
+│   ├── deps.py
+│   └── security.py
 ├── models/
-│   └── product_model.py
+│   ├── product_model.py
+│   └── user_model.py
 ├── schemas/
-│   └── product_schema.py
+│   ├── product_schema.py
+│   └── user_schema.py
 ├── .env.example
 ├── .gitignore
 ├── alembic.ini
@@ -49,7 +56,6 @@ nexus-api-products/
 ├── requirements.txt
 └── LICENSE
 ```
-
 ---
 
 ## Prerequisites
@@ -80,11 +86,11 @@ source venv/bin/activate
 
 ### 4. Install dependencies
 
-pip install fastapi uvicorn pydantic sqlalchemy asyncpg alembic pydantic-settings python-dotenv
+pip install fastapi uvicorn pydantic sqlalchemy asyncpg alembic pydantic-settings python-dotenv python-jose passlib python-multipart
 
 ### 5. Configure environment variables
 
-Copy the example file and fill in your database credentials:
+Copy the example file and fill in your credentials:
 
 cp .env.example .env
 
@@ -104,16 +110,37 @@ uvicorn main:app --reload
 
 ---
 
+## Authentication
+
+This API uses JWT Bearer token authentication.
+
+1. Register a new user via POST /api/v1/users/signup
+2. Login via POST /api/v1/users/login to receive your access token
+3. Use the token in the Authorization header for protected endpoints:
+
+Authorization: Bearer <your_token>
+
+Protected endpoints return 401 Unauthorized when accessed without a valid token.
+
+---
+
 ## API Endpoints
 
-### GET /api/v1/products/
-Returns a list of all products.
+### Users
 
-### GET /api/v1/products/{id}
-Returns a product by its ID.
+POST /api/v1/users/signup — register a new user
+POST /api/v1/users/login — login and receive JWT token
+GET /api/v1/users/logged — get current authenticated user (protected)
+GET /api/v1/users/ — list all users (protected)
+GET /api/v1/users/{id} — get user by ID
+PUT /api/v1/users/{id} — update user (protected)
+DELETE /api/v1/users/{id} — delete user (protected)
 
-### POST /api/v1/products/
-Creates a new product.
+### Products
+
+GET /api/v1/products/ — list all products
+GET /api/v1/products/{id} — get product by ID
+POST /api/v1/products/ — create new product
 
 Example body:
 
@@ -123,8 +150,8 @@ Example body:
   "description": "Product description"
 }
 
-### DELETE /api/v1/products/{id}
-Deletes a product by ID.
+PUT /api/v1/products/{id} — update product (protected)
+DELETE /api/v1/products/{id} — delete product
 
 ---
 
