@@ -1,5 +1,3 @@
-import py
-
 async def test_create_product(client):
     response = await client.post("/api/v1/products/", json={
         "name": "Notebook",
@@ -23,7 +21,7 @@ async def test_get_product_not_found(client):
     response = await client.get("/api/v1/products/10")
     assert response.status_code == 404
 
-async def test_uptade_product_without_token(client):
+async def test_update_product_without_token(client):
     response = await client.put("/api/v1/products/1", json={
         "name": "Smartphone",
         "price": 1200.0,
@@ -31,7 +29,7 @@ async def test_uptade_product_without_token(client):
     })
     assert response.status_code == 401
 
-async def test_uptade_product_with_token(client):
+async def test_update_product_with_token(client):
     await client.post("/api/v1/users/signup", json={
         "name": "Bruna",
         "lastname": "Bertolli",

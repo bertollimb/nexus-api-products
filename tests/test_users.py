@@ -1,5 +1,3 @@
-import pytest 
-
 USER_DATA = {
     "name": "Matheus",
     "lastname": "Anastácio",
