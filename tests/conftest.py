@@ -34,14 +34,13 @@ def event_loop():
     yield loop
     loop.close()
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(autouse=True)
 async def setup_database():
     async with engine_test.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
     yield
-    async with engine_test.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-
+    
 @pytest.fixture(scope="session")
 async def client():
     async with AsyncClient(
@@ -49,3 +48,45 @@ async def client():
         base_url="http://test"
     ) as ac:
         yield ac
+
+@pytest.fixture
+def user_data():
+    return {
+        "name": "Matheus",
+        "lastname": "Anastácio",
+        "email": "matheus@test.com",
+        "password": "test1234",
+        "is_admin": False
+    }
+
+@pytest.fixture
+async def created_user(client, user_data):
+    response = await client.post("/api/v1/users/signup", json=user_data)
+
+    assert response.status_code == 201
+
+    return {
+        "request": user_data,
+        "response": response.json()
+    }
+
+@pytest.fixture
+async def auth_token(client, created_user):
+    response = await client.post("/api/v1/users/login", data={
+        "username": created_user["request"]["email"],
+        "password": created_user["request"]["password"]
+    })
+
+    return response.json()["access_token"]
+
+@pytest.fixture
+async def created_product(client):
+    response = await client.post("/api/v1/products/", json={
+        "name": "Smartphone",
+                "price": 1200.0,
+                "description": "Samsung A20"
+            }
+    )
+
+    assert response.status_code == 201
+    return response.json()
