@@ -1,31 +1,38 @@
-USER_DATA = {
-    "name": "Matheus",
-    "lastname": "Anastácio",
-    "email": "matheus@test.com",
-    "password": "test1234",
-    "is_adimn": False
-}
-
-async def test_signup_success(client):
-    response = await client.post("/api/v1/users/signup", json=USER_DATA)
+async def test_signup_success(client, user_data):
+    response = await client.post("/api/v1/users/signup", json=user_data)
+    data = response.json()
+    
     assert response.status_code == 201
-    assert response.json()["email"] == USER_DATA["email"]
+    assert data["name"] == user_data["name"]
+    assert data["lastname"] == user_data["lastname"]
+    assert data["email"] == user_data["email"]
+    assert data["is_admin"] == user_data["is_admin"]
+    assert "password" not in data
 
-async def test_signup_duplicate_email(client):
-    response = await client.post("/api/v1/users/signup", json=USER_DATA)
+async def test_signup_duplicate_email(client, user_data):
+    await client.post("/api/v1/users/signup", json=user_data)
+
+    response = await client.post("/api/v1/users/signup", json=user_data)
+
     assert response.status_code == 406
 
-async def test_login_success(client):
+async def test_login_success(client, created_user):
     response = await client.post("/api/v1/users/login", data={
-        "username": USER_DATA["email"],
-        "password": USER_DATA["password"]
-    })
-    assert response.status_code == 200
-    assert "access_token" in response.json()
+        "username": created_user["request"]["email"],
+        "password": created_user["request"]["password"],
+        },
+    )
 
-async def test_login_wrong_password(client):
+    data = response.json()
+
+    assert response.status_code == 200
+    assert "access_token" in data
+    assert data["token_type"] == "bearer"
+
+async def test_login_wrong_password(client, created_user):
     response = await client.post("/api/v1/users/login", data={
-        "username": USER_DATA["email"],
+        "username": created_user["request"]["email"],
         "password": "incorrect password"
-    })
+        }
+    )
     assert response.status_code == 400
