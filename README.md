@@ -1,35 +1,26 @@
 # Products API
 
-REST API built with FastAPI for product management. The project implements full CRUD operations with PostgreSQL database persistence, JWT authentication, and automated tests.
+A REST API for product management, built with FastAPI as a backend study project — full CRUD, async database access, and JWT authentication implemented from scratch (not scaffolded from a template).
 
----
+**Live API docs:** https://nexus-api-products.onrender.com/docs
 
-## About the Project
+## About the project
 
-This API allows you to create, list, retrieve, update, and delete products. Data is persisted in a PostgreSQL database using SQLAlchemy async. The API includes a complete user management system with JWT authentication, protecting sensitive endpoints from unauthorized access. The project includes an automated test suite covering the main API flows.
+This API allows creating, listing, retrieving, updating, and deleting products, with data persisted in PostgreSQL through fully async SQLAlchemy. It also includes a complete user system with JWT authentication, protecting write/sensitive endpoints from unauthorized access. The project was built to practice professional API structuring (layered architecture, migrations, automated testing) rather than as a one-off script.
 
----
+## Tech stack
 
-## Technologies Used
+- **Python 3.12** / **FastAPI**
+- **PostgreSQL** (Supabase) with **SQLAlchemy** (fully async)
+- **Alembic** — database migrations
+- **Pydantic** / **Pydantic Settings**
+- **JWT** authentication (python-jose, passlib, python-multipart)
+- **pytest** / **pytest-asyncio** / **httpx** — automated test suite, running against an isolated SQLite database
+- **Docker** — containerized deployment
+- Deployed on **Render**
 
-- Python 3.10+
-- FastAPI
-- Uvicorn
-- Pydantic
-- PostgreSQL
-- SQLAlchemy (async)
-- Alembic
-- Pydantic Settings
-- python-jose
-- passlib
-- python-multipart
-- pytest
-- pytest-asyncio
-- httpx
+## Project structure
 
----
-
-## Project Structure
 ```
 nexus-api-products/
 ├── api/
@@ -41,10 +32,8 @@ nexus-api-products/
 ├── alembic/
 │   └── versions/
 ├── core/
-│   ├── auth.py
 │   ├── configs.py
 │   ├── database.py
-│   ├── deps.py
 │   └── security.py
 ├── models/
 │   ├── product_model.py
@@ -57,139 +46,115 @@ nexus-api-products/
 │   ├── conftest.py
 │   ├── test_products.py
 │   └── test_users.py
+├── .dockerignore
 ├── .env.example
 ├── .gitignore
-├── alembic.ini
-├── pytest.ini
+├── Dockerfile
+├── LICENSE
 ├── main.py
-├── requirements.txt
-└── LICENSE
+├── pytest.ini
+└── requirements.txt
 ```
----
 
-## Prerequisites
+## Getting started
 
-- Python 3.10+
-- PostgreSQL running locally
+### Prerequisites
+- Python 3.12+
+- A PostgreSQL database (this project uses [Supabase](https://supabase.com))
 
----
+### Local setup
 
-## Installation
-
-### 1. Clone the repository
-
+```bash
 git clone https://github.com/bertollimb/nexus-api-products
 cd nexus-api-products
-
-### 2. Create a virtual environment
-
 python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-### 3. Activate the virtual environment
+Copy the example file and fill in your own credentials:
 
-Windows:
-venv\Scripts\activate
-
-Linux/Mac:
-source venv/bin/activate
-
-### 4. Install dependencies
-
-pip install fastapi uvicorn pydantic sqlalchemy asyncpg alembic pydantic-settings python-dotenv python-jose passlib python-multipart pytest pytest-asyncio httpx aiosqlite
-
-### 5. Configure environment variables
-
-Copy the example file and fill in your credentials:
-
+```bash
 cp .env.example .env
+```
 
-### 6. Run database migrations
+Apply migrations and run:
 
+```bash
 alembic upgrade head
-
----
-
-## Running the Project
-
-python main.py
-
-or
-
 uvicorn main:app --reload
+```
 
----
+API available at `http://localhost:8000/docs` (Swagger) or `http://localhost:8000/redoc`.
 
-## Running Tests
+### Running with Docker
 
-pytest tests/ -v
+```bash
+docker build -t nexus-api-products .
+docker run --rm -p 8000:8000 --env-file .env nexus-api-products
+```
 
-Tests use an isolated SQLite database and do not affect your PostgreSQL data.
+### Running the test suite
 
----
+```bash
+pytest -v
+```
+
+Tests run against an isolated SQLite database and never touch the PostgreSQL data used in development or production.
 
 ## Authentication
 
-This API uses JWT Bearer token authentication.
+This API uses JWT Bearer token authentication:
 
-1. Register a new user via POST /api/v1/users/signup
-2. Login via POST /api/v1/users/login to receive your access token
-3. Use the token in the Authorization header for protected endpoints:
+1. Register via `POST /api/v1/users/signup`
+2. Log in via `POST /api/v1/users/login` to receive an access token
+3. Send the token on protected endpoints:
+   ```
+   Authorization: Bearer <your_token>
+   ```
 
-Authorization: Bearer <your_token>
+Protected endpoints return `401 Unauthorized` when accessed without a valid token.
 
-Protected endpoints return 401 Unauthorized when accessed without a valid token.
+## API endpoints
 
----
+**Users**
+| Method | Path | Description |
+|---|---|---|
+| POST | `/api/v1/users/signup` | Register a new user |
+| POST | `/api/v1/users/login` | Log in and receive a JWT token |
+| GET | `/api/v1/users/logged` | Get the current authenticated user (protected) |
+| GET | `/api/v1/users/` | List all users (protected) |
+| GET | `/api/v1/users/{id}` | Get user by ID |
+| PUT | `/api/v1/users/{id}` | Update user (protected) |
+| DELETE | `/api/v1/users/{id}` | Delete user (protected) |
 
-## API Endpoints
+**Products**
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/v1/products/` | List all products |
+| GET | `/api/v1/products/{id}` | Get product by ID |
+| POST | `/api/v1/products/` | Create a new product |
+| PUT | `/api/v1/products/{id}` | Update product (protected) |
+| DELETE | `/api/v1/products/{id}` | Delete product |
 
-### Users
-
-POST /api/v1/users/signup — register a new user
-POST /api/v1/users/login — login and receive JWT token
-GET /api/v1/users/logged — get current authenticated user (protected)
-GET /api/v1/users/ — list all users (protected)
-GET /api/v1/users/{id} — get user by ID
-PUT /api/v1/users/{id} — update user (protected)
-DELETE /api/v1/users/{id} — delete user (protected)
-
-### Products
-
-GET /api/v1/products/ — list all products
-GET /api/v1/products/{id} — get product by ID
-POST /api/v1/products/ — create new product
-
-Example body:
-
+Example `POST /api/v1/products/` body:
+```json
 {
   "name": "Product 1",
   "price": 10.5,
   "description": "Product description"
 }
+```
 
-PUT /api/v1/products/{id} — update product (protected)
-DELETE /api/v1/products/{id} — delete product
+## Deployment
 
----
+- **API**: Docker container on [Render](https://render.com) (Frankfurt region), built directly from the repository's `Dockerfile`
+- **Database**: [Supabase](https://supabase.com) — managed PostgreSQL (Frankfurt region)
+
+Environment variables (`DB_URL`, `JWT_SECRET`, and optionally `ALGORITHM`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `REFRESH_TOKEN_EXPIRE_DAYS`) are configured directly on Render and are never baked into the Docker image — `.dockerignore` explicitly excludes `.env`, `venv/`, and other files that shouldn't ship inside the container.
 
 ## Notes
 
-- Data is persisted in a PostgreSQL database.
-- Run migrations before starting the server for the first time.
-- Tests use an isolated SQLite in-memory database.
-- This project is intended for learning FastAPI, SQLAlchemy, and professional API structuring.
-
----
-
-## Automatic Documentation
-
-After starting the server:
-
-- Swagger UI: http://localhost:8000/docs
-- Redoc: http://localhost:8000/redoc
-
----
-
-## Author
-
-Project developed for backend study with Python and FastAPI.
+- Migrations must be applied before starting the server for the first time.
+- Tests use an isolated in-memory SQLite database, kept separate from the PostgreSQL data used in development and production.
+- Built for learning FastAPI, async SQLAlchemy, and professional-grade API structuring.
